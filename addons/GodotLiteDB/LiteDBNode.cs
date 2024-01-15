@@ -9,8 +9,13 @@ using LiteDB.Engine;
 [Tool]
 public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
 {
+    private LiteDatabase _instance;
     private string _saveFilePath = string.Empty;
 
+    /// <summary>
+    /// Gets and sets the path where the database will be saved and loaded from.
+    /// This should be Guodot paths such as user://database.db.
+    /// </summary>
     [Export(PropertyHint.SaveFile, "*.db")]
     public string SaveFilePath 
     { 
@@ -25,8 +30,10 @@ public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
         }
     }
 
+    /// <summary>
+    /// Transforms the SaveFilePath to a system file path.
+    /// </summary>
     public string GlobalPath => ProjectSettings.GlobalizePath(SaveFilePath);
-
     public BsonMapper Mapper => _instance.Mapper;
 
     public ILiteStorage<string> FileStorage => _instance.FileStorage;
@@ -37,9 +44,8 @@ public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
     public long LimitSize { get => _instance.LimitSize; set => _instance.LimitSize = value; }
     public int CheckpointSize { get => _instance.CheckpointSize; set => _instance.CheckpointSize = value; }
 
-    public Collation Collation => ((ILiteDatabase)_instance).Collation;
+    public Collation Collation => _instance.Collation;
 
-    private LiteDatabase _instance;
 
     public override void _Ready()
     {
