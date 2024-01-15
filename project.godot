@@ -21,7 +21,7 @@ project/assembly_name="Godot LiteDB"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/GodotLiteDB/plugin.cfg", "res://addons/godot_litedb/plugin.cfg")
+enabled=PackedStringArray("res://addons/GodotLiteDB/plugin.cfg")
 
 [rendering]
 
