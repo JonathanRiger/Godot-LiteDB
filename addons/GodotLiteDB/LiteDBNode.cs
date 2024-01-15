@@ -101,7 +101,7 @@ public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
     /// <summary>
     /// Get/Set database limit size (in bytes). New value must be equals or larger than current database size.
     /// </summary>
-    [Export]
+    [Export(PropertyHint.Range, "0,1000000000,or_greater,suffix:bytes")]
     public long LimitSize 
     { 
         get => _instance?.LimitSize ?? _limitSize; 
@@ -121,7 +121,7 @@ public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
     //     from log file to data file). Use 0 to manual-only checkpoint (and no checkpoint
     //     on dispose) Default: 1000 pages
     /// </summary>
-    [Export(PropertyHint.Range, "0,100000,exp,or_greater,suffix:Pages")]
+    [Export(PropertyHint.Range, "0,100000,or_greater,suffix:Pages")]
     public int CheckpointSize 
     { 
         get => _instance?.CheckpointSize ?? _checkpointSize; 
