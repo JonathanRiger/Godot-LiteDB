@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.Metadata;
 using Godot;
 using LiteDB;
 using LiteDB.Engine;
@@ -11,6 +10,13 @@ public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
 {
     private LiteDatabase _instance;
     private string _saveFilePath = string.Empty;
+
+    public LiteDBNode()
+    {
+        TimeoutInSeconds = 60;
+        LimitSize = 100000000;
+        CheckpointSize = 1000;
+    }
 
     /// <summary>
     /// Gets and sets the path where the database will be saved and loaded from.
@@ -38,18 +44,108 @@ public partial class LiteDBNode : Node, ILiteDatabase, IDisposable
 
     public ILiteStorage<string> FileStorage => _instance.FileStorage;
 
-    public int UserVersion { get => _instance.UserVersion; set => _instance.UserVersion = value; }
-    public TimeSpan Timeout { get => _instance.Timeout; set => _instance.Timeout = value; }
-    public bool UtcDate { get => _instance.UtcDate; set => _instance.UtcDate = value; }
-    public long LimitSize { get => _instance.LimitSize; set => _instance.LimitSize = value; }
-    public int CheckpointSize { get => _instance.CheckpointSize; set => _instance.CheckpointSize = value; }
 
+    private double _timeout = 60;
+
+    /// <summary>
+    /// Configures the timeout for database access in seconds.
+    /// </summary>
+    [Export(PropertyHint.Range, "0,300,or_greater,suffix:s")]
+    public double TimeoutInSeconds
+    { 
+        get => _instance?.Timeout.TotalSeconds ?? _timeout; 
+        set 
+        {
+            _timeout = value;
+            if (_instance is not null)
+            {
+                _instance.Timeout = TimeSpan.FromSeconds(value);
+            }
+        }
+    }
+
+    public int UserVersion 
+    { 
+        get => _instance?.UserVersion ?? -1; 
+        set 
+        {
+            if (_instance is not null)
+            {
+                _instance.UserVersion = value;
+            }
+        }
+    }
+
+    public TimeSpan Timeout 
+    { 
+        get => _instance.Timeout; 
+        set => _instance.Timeout = value; 
+    }
+    private bool _utcDate;
+    [Export]
+    public bool UtcDate 
+    { 
+        get => _instance?.UtcDate ?? _utcDate; 
+        set 
+        {
+            if (_instance is not null)
+            {
+                _instance.UtcDate = value;
+            }
+            _utcDate = value;
+        }
+    }
+
+    private long _limitSize;
+
+    /// <summary>
+    /// Get/Set database limit size (in bytes). New value must be equals or larger than current database size.
+    /// </summary>
+    [Export]
+    public long LimitSize 
+    { 
+        get => _instance?.LimitSize ?? _limitSize; 
+        set 
+        {
+            if (_instance is not null)
+            {
+                _instance.LimitSize = value;
+            }
+            _limitSize = value;
+        }  
+    }
+
+    private int _checkpointSize = 1000;
+    /// <summary>
+    /// Get/Set in how many pages (8 Kb each page) log file will auto checkpoint (copy
+    //     from log file to data file). Use 0 to manual-only checkpoint (and no checkpoint
+    //     on dispose) Default: 1000 pages
+    /// </summary>
+    [Export(PropertyHint.Range, "0,100000,exp,or_greater,suffix:Pages")]
+    public int CheckpointSize 
+    { 
+        get => _instance?.CheckpointSize ?? _checkpointSize; 
+        set 
+        {
+            if (_instance is not null)
+            {
+                _instance.CheckpointSize = value;
+            }
+            _checkpointSize = value;
+        } 
+    }
+    
     public Collation Collation => _instance.Collation;
-
 
     public override void _Ready()
     {
-        _instance = new LiteDatabase(GlobalPath);   
+        _instance = new LiteDatabase(GlobalPath, null)
+        {
+            Timeout = TimeSpan.FromSeconds(TimeoutInSeconds),
+            UtcDate = UtcDate,
+            CheckpointSize = CheckpointSize,
+            LimitSize = LimitSize
+        };
     }
 
     public override void _ExitTree()

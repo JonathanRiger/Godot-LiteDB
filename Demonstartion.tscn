@@ -14,10 +14,6 @@ script = ExtResource("1_ryee2")
 Database = NodePath("LiteDBNode")
 Input = NodePath("VBoxContainer/TextEdit")
 
-[node name="LiteDBNode" type="Node" parent="."]
-script = ExtResource("2_sa05q")
-SaveFilePath = "res://ExampleDatabase.db"
-
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -48,6 +44,13 @@ text = "Previoius"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Next"
+
+[node name="LiteDBNode" type="Node" parent="."]
+script = ExtResource("2_sa05q")
+SaveFilePath = "res://ExampleDatabase.db"
+TimeoutInSeconds = 60.0
+LimitSize = 100000000
+CheckpointSize = 1000
 
 [connection signal="pressed" from="VBoxContainer/Save" to="." method="SaveInput"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LoadPrevious" to="." method="LoadPrevious"]
