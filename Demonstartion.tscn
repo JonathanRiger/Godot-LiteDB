@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://47n0dpgvy5a8"]
+
+[ext_resource type="Script" path="res://Demonstartion.cs" id="1_ryee2"]
+[ext_resource type="Script" path="res://addons/GodotLiteDB/LiteDBNode.cs" id="2_sa05q"]
+
+[node name="Demonstartion" type="Control" node_paths=PackedStringArray("Database", "Input")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ryee2")
+Database = NodePath("LiteDBNode")
+Input = NodePath("VBoxContainer/TextEdit")
+
+[node name="LiteDBNode" type="Node" parent="."]
+script = ExtResource("2_sa05q")
+SaveFilePath = "res://ExampleDatabase.db"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_vertical = 6
+placeholder_text = "Enter text to save..."
+
+[node name="Save" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Save"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="LoadPrevious" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Previoius"
+
+[node name="LoadNext" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Next"
+
+[connection signal="pressed" from="VBoxContainer/Save" to="." method="SaveInput"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LoadPrevious" to="." method="LoadPrevious"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LoadNext" to="." method="LoadNext"]
